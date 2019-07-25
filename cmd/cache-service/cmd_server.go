@@ -90,6 +90,7 @@ func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
 		return err
 	})
 
+	// nolint : errcheck
 	go http.ListenAndServe(":8086", health)
 
 }
