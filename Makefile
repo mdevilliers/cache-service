@@ -1,4 +1,5 @@
 
+
 CMD      := cache-service
 PKG      := github.com/mdevilliers/cache-service
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
@@ -23,11 +24,7 @@ BIN_VERSION ?= ${GIT_TAG}
 DOCKER_REGISTRY := mdevilliers
 
 # Docker Tag from Git
-DOCKER_IMAGE_TAG  ?= ${GIT_TAG}
-ifeq ("$(DOCKER_IMAGE_TAG)","")
-	DOCKER_IMAGE_TAG = $(GIT_SHA)
-endif
-
+DOCKER_IMAGE_TAG  ?= ${GIT_TAG}_$(GIT_SHA)_$(GIT_DIRTY)
 DOCKER_BUILD_CMD := $(GO_BUILD_VARS) $(GO_BUILD) $(GO_BUILD_FLAGS) -o docker/$(EXE_NAME) github.com/mdevilliers/cache-service/cmd/cache-service
 DOCKER_PACKAGE_CMD := docker build -t $(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG) -t $(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME):latest docker/
 
@@ -85,8 +82,9 @@ image:
 		--build-arg GIT_TAG=$(GIT_TAG) \
 		--build-arg GIT_DIRTY=$(GIT_DIRTY) \
 		-f ./build/package/Dockerfile \
-		-t $(DOCKER_REGISTRY):$(DOCKER_IMAGE_TAG) .
+		-t $(DOCKER_REGISTRY)/$(CMD):$(DOCKER_IMAGE_TAG) .
 
+.PHONY: test
 # Run test suite
 test:
 ifeq ("$(wildcard $(shell which gocov))","")
@@ -112,3 +110,15 @@ $(BIN_OUTDIR)/golangci-lint/golangci-lint:
 	chmod +x $(BIN_OUTDIR)/golangci-lint
 	rm -f $(GOLANGCI_LINT_ARCHIVE)
 
+.PHONY: hack_image_deploy_local
+# task to deploy and build a local image using a `kind` environment
+# see ./hack/kind/ for details.
+# This task has the following steps :
+# - build the application and docker image locally
+# - deploy the image to the 'kind' cluster
+# - set the image in the deployment pod to the latest value
+# - force the deployment to redeploy by changing some metadata
+hack_image_deploy_local: image deploy
+	kind load docker-image $(DOCKER_REGISTRY)/$(CMD):$(DOCKER_IMAGE_TAG)
+	kubectl set image deployment/cache-service-deployment cache-service=$(DOCKER_REGISTRY)/cache-service:$(DOCKER_IMAGE_TAG)
+	kubectl patch -f ./k8s/cache-service_deployment.yaml -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"

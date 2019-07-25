@@ -5,4 +5,18 @@
 
 POC for a simple caching service
 
+### Local developement
+
+TODO :
+
+
+### Local K8s deployment
+
+Install Kind using the instructions [here](/hack/kind)
+
+```
+export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
+make hack_image_deploy_local
+```
+
 
