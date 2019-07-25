@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"os/signal"
 
 	"github.com/go-redis/redis"
 	"github.com/heptiolabs/healthcheck"
@@ -24,10 +25,6 @@ func registerServerCommand(root *cobra.Command) {
 		Short: "Runs the service as a GRPC service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			for _, e := range os.Environ() {
-				log.Error().Msg(e)
-			}
-
 			version.Write(os.Stdout)
 
 			redisServer := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_HOST", "0.0.0.0")
@@ -45,13 +42,20 @@ func registerServerCommand(root *cobra.Command) {
 			serv := service.NewCacheService(log, store.NewRedisStore(redisClient))
 
 			server := server.New(log, serv)
-			err := server.Start(binding)
-			if err != nil {
-				return err
-			}
 
-			// TODO : add graceful shutdown
-			defer server.Stop()
+			go func() {
+				err := server.Start(binding)
+				if err != nil {
+					log.Err(err).Msg("error running server")
+				}
+			}()
+
+			stop := make(chan os.Signal, 1)
+			signal.Notify(stop, os.Interrupt)
+
+			<-stop
+
+			server.Stop()
 
 			return nil
 		},
