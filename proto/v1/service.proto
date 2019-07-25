@@ -39,7 +39,6 @@ message GetByKeyResponse {
     Status status = 1;
     // Key should be a unique identifier
     string key = 2;
-
     // Contents is the stringified saved value
     string contents = 3;
 }
