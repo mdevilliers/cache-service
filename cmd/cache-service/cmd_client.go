@@ -30,6 +30,8 @@ func registerClientCommand(root *cobra.Command) {
 
 			ctx := context.Background()
 
+			fmt.Println("happy path")
+
 			setResponse, err := client.Set(ctx, &proto.SetRequest{
 				Key:      "foo",
 				Contents: "hello",
@@ -67,7 +69,6 @@ func registerClientCommand(root *cobra.Command) {
 				_, err := client.Set(ctx, &proto.SetRequest{
 					Key:      fmt.Sprintf("foo:%d", rand.Intn(10000)),
 					Contents: "hello",
-					Ttl:      123,
 				})
 
 				if err != nil {
@@ -87,6 +88,29 @@ func registerClientCommand(root *cobra.Command) {
 			for n, i := range randomNResponse.GetKeys() {
 				fmt.Println(fmt.Sprintf("%d : %s", n, i))
 			}
+
+			fmt.Println("sad path")
+
+			setResponse, err = client.Set(ctx, &proto.SetRequest{
+				Contents: "hello",
+				Ttl:      10000,
+			})
+
+			if err != nil {
+				return errors.Wrap(err, "error caching item")
+			}
+
+			fmt.Println("no key set : ", setResponse)
+
+			setResponse, err = client.Set(ctx, &proto.SetRequest{
+				Key: "hello",
+			})
+
+			if err != nil {
+				return errors.Wrap(err, "error caching item")
+			}
+
+			fmt.Println("no content set : ", setResponse)
 
 			return nil
 		},
