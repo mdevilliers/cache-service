@@ -3,7 +3,6 @@ jobs:
   build-svc:
     docker:
       - image: circleci/golang:1.12.7
-    working_directory: /cache-service
     steps:
       - checkout
       - run: make lint
