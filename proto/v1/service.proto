@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package cacheservice_v1;
+
+service Cache {
+    // Set caches a piece of content with an optional TTL
+    rpc Set (SetRequest) returns (SetResponse) {}
+
+    // GetByKey returns a piece of content if still cached
+    rpc GetByKey(GetByKeyRequest) returns (GetByKeyResponse) {}
+
+    // GetRandomN returns N random keys
+    rpc GetRandomN(GetRandomNRequest) returns (GetRandomNResponse) {}
+
+    // Purge forces removal from the cache
+    rpc Purge(PurgeRequest) returns (PurgeResponse) {}
+}
+
+message SetRequest {
+    // Key should be a unique identifier else the existing 
+    // record if any will be updated
+    string key = 1;
+    // Contents should be stringified for storage
+    string contents = 2;
+    // TTL is the time in milliseconds to cache an item for
+    int64 ttl = 3;
+}
+
+message SetResponse {
+    Status status =1;
+}
+
+message GetByKeyRequest {
+    // Key should be a unique identifier
+    string key =1;
+}
+
+message GetByKeyResponse {
+    Status status = 1;
+    // Key should be a unique identifier
+    string key = 2;
+
+    // Contents is the stringified saved value
+    string contents = 3;
+}
+
+message GetRandomNRequest {
+    int32 count= 1 ;
+}
+
+message GetRandomNResponse {
+    Status status = 1;
+    // Keys is a list of keys
+    repeated string keys = 2;
+}
+
+message PurgeRequest {
+    // Key to purge
+    string key=1;
+}
+
+message PurgeResponse {
+    Status status = 1;
+}
+
+// Status contains an application sensitive way of describing an error with an operation.
+// This deviates from using GRPC error codes with the main benefit being that any error
+// is either a dead server or a protocol failure (and is therefore safe to retry).
+message Status {
+    bool ok = 1;
+    Error error=2;
+}
+
+// Error contains a message and an ErrorCode
+message Error {
+    string message = 1;
+    ErrorCode code = 2;
+}
+
+enum ErrorCode {
+    UNKNOWN_ERROR = 0;
+    ITEM_NOT_CACHED = 1000;
+    KEY_NOT_FOUND = 1001;
+}
