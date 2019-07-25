@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/heptiolabs/healthcheck"
+	"github.com/mdevilliers/cache-service/internal/env"
 	"github.com/mdevilliers/cache-service/internal/server"
 	"github.com/mdevilliers/cache-service/internal/service"
 	"github.com/mdevilliers/cache-service/internal/store"
@@ -29,14 +30,14 @@ func registerServerCommand(root *cobra.Command) {
 
 			version.Write(os.Stdout)
 
-			redisServer, _ := os.LookupEnv("REDIS_MASTER_SERVICE_HOST")
-			redisPort, _ := os.LookupEnv("REDIS_MASTER_SERVICE_PORT")
+			redisServer := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_HOST", "0.0.0.0")
+			redisPort := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_PORT", "6379")
 
 			redisClient := redis.NewClient(&redis.Options{
 				Addr: fmt.Sprintf("%s:%s", redisServer, redisPort),
 			})
 
-			port, _ := os.LookupEnv("PORT")
+			port := env.FromEnvWithDefaultStr("PORT", "3000")
 			binding := fmt.Sprintf(":%s", port)
 
 			go configureHealthChecks(log, redisClient)
@@ -62,9 +63,11 @@ func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
 
 	health := healthcheck.NewHandler()
 
+	// life is too easy without some random failures
+	// This is only here for demonstration purposes
 	health.AddLivenessCheck("random-failure", func() error {
 
-		r := rand.Intn(100)
+		r := rand.Intn(1000)
 
 		logger.Info().Fields(map[string]interface{}{
 			"random": r,
@@ -76,8 +79,14 @@ func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
 
 	})
 
+	// cache-service is only ready if it can reach redid
 	health.AddReadinessCheck("redis-service-check", func() error {
 		_, err := redisClient.Ping().Result()
+
+		if err != nil {
+			logger.Err(err).Msg("failed to ping redis")
+		}
+
 		return err
 	})
 
