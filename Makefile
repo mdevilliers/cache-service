@@ -111,6 +111,8 @@ $(BIN_OUTDIR)/golangci-lint/golangci-lint:
 	rm -f $(GOLANGCI_LINT_ARCHIVE)
 
 .PHONY: install_proto_tools
+# onstall a known version of the protoc compiler
+# TODO : deploy to a Docker registry and each developer can download the same copy.
 install_proto_tools:
 	docker build -t $(DOCKER_REGISTRY)/proto_tools -f ./build/package/Dockerfile.proto .
 
