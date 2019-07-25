@@ -8,8 +8,29 @@ jobs:
       - run: make lint
       - run: make test
       - run: make build
+  make-release-image:
+    docker:
+      - image: circleci/golang:1.12.7
+    # TODO : implement make-release-image
+    # Maybe this would be
+    #  - a github release
+    #  - deploy image to a docker repository
+    #  - something else
+    steps:
+      - run: echo "implement make-release-image"
+
+filter_branch_master: &filter_branch_master
+  filters:
+    branches:
+      only:
+        - master
+
 workflows:
   version: 2
   all:
     jobs:
       - build-svc
+      - make-release-image:
+          requires:
+            - build-svc
+          << : *filter_branch_master
