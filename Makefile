@@ -110,6 +110,30 @@ $(BIN_OUTDIR)/golangci-lint/golangci-lint:
 	chmod +x $(BIN_OUTDIR)/golangci-lint
 	rm -f $(GOLANGCI_LINT_ARCHIVE)
 
+.PHONY: install_proto_tools
+install_proto_tools:
+	docker build -t $(DOCKER_REGISTRY)/proto_tools -f ./build/package/Dockerfile.proto .
+
+.PHONY: proto
+# regenerate protobuf files
+proto:
+	docker run -v $(PWD)/proto:/go/proto $(DOCKER_REGISTRY)/proto_tools
+
+.PHONY: proto_verify
+# verify proto binding has been generated
+# The CI will check that no un-generated files have been checked in
+# TODO : add stages in CI to check
+proto_verify: proto
+	git diff --exit-code
+
+.PHONY: mocks
+# generate mocks
+mocks:
+ifeq ("$(wildcard $(shell which counterfeiter))","")
+	go get github.com/maxbrunsfeld/counterfeiter/v6
+endif
+	counterfeiter -o=./proto/v1/mocks/service.go ./proto/v1/service.pb.go CacheClient
+
 .PHONY: hack_image_deploy_local
 # task to deploy and build a local image using a `kind` environment
 # see ./hack/kind/ for details.

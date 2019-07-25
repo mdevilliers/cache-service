@@ -7,8 +7,18 @@ POC for a simple caching service
 
 ### Local developement
 
-TODO :
+To update the generated protobuf files :
 
+```
+make install_proto_tools
+make proto
+```
+
+To generate all of the mocks
+
+```
+make mocks
+```
 
 ### Local K8s deployment
 
