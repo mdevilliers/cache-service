@@ -79,7 +79,7 @@ func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
 
 	})
 
-	// cache-service is only ready if it can reach redid
+	// cache-service is only ready if it can reach redis
 	health.AddReadinessCheck("redis-service-check", func() error {
 		_, err := redisClient.Ping().Result()
 
