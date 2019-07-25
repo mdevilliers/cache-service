@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-service-deployment
+  labels:
+    app: cache-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cache-service
+  template:
+    metadata:
+      labels:
+        app: cache-service
+    spec:
+      containers:
+        - image: mdevilliers/cache-service:latest
+          name: cache-service
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 3000
+              protocol: TCP
