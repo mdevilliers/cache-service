@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cache-service-svc-v1
+spec:
+  # using a "NodePort" to publish the service - see http://kubernetes.io/docs/user-guide/services/#type-nodeport
+  type: "NodePort"
+  selector:
+    app: cache-service
+  ports:
+    - targetPort: 3000
+      port: 8080
+      protocol: TCP
+      nodePort: 30036  # WARNING : hard coded for demo

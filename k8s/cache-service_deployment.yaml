@@ -15,7 +15,7 @@ spec:
         app: cache-service
     spec:
       containers:
-        - image: mdevilliers/cache-service:latest
+        - image: mdevilliers/cache-service
           name: cache-service
           imagePullPolicy: "IfNotPresent"
           ports:
