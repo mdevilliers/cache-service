@@ -29,4 +29,3 @@ export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
 make hack_image_deploy_local
 ```
 
-

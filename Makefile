@@ -133,6 +133,7 @@ ifeq ("$(wildcard $(shell which counterfeiter))","")
 	go get github.com/maxbrunsfeld/counterfeiter/v6
 endif
 	counterfeiter -o=./proto/v1/mocks/service.go ./proto/v1/service.pb.go CacheClient
+	counterfeiter -o=./internal/service/mocks/store.go ./internal/service/service.go store
 
 .PHONY: hack_image_deploy_local
 # task to deploy and build a local image using a `kind` environment

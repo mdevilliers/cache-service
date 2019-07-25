@@ -1,10 +1,10 @@
 package main
 
 import (
-	"io"
 	"os"
 
-	"github.com/mdevilliers/cache-service/internal/version"
+	"github.com/mdevilliers/cache-service/internal/env"
+	"github.com/mdevilliers/cache-service/internal/logger"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -28,12 +28,17 @@ func rootCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:           "cache-service",
-		Short:         "TODO: ???",
+		Short:         "Demonstration GRPC K8s service",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+
 			// Setup default logger
-			log = initLogger(logLevel, useConsole , makeVerbose)
+			ll := env.FromEnvWithDefaultStr("CACHE_SERVICE_LOG_LEVEL", logLevel)
+			uc := env.FromEnvWithDefaultBool("CACHE_SERVICE_LOG_USE_CONSOLE", useConsole)
+			mv := env.FromEnvWithDefaultBool("CACHE_SERVICE_LOG_VERBOSE", makeVerbose)
+
+			log = logger.New(ll, uc, mv)
 			return nil
 		},
 	}
@@ -42,31 +47,11 @@ func rootCmd() *cobra.Command {
 	pflags.BoolVar(&useConsole, "console", useConsole, "use console log writer")
 	pflags.BoolVarP(&makeVerbose, "verbose", "v", makeVerbose, "verbose logging")
 	pflags.StringVar(&logLevel, "log-level", logLevel, "log level")
+
 	// Add sub commands
 	registerVersionCommand(cmd)
-	return cmd
-}
+	registerServerCommand(cmd)
+	registerClientCommand(cmd)
 
-func initLogger(logLevel string, useConsole, makeVerbose bool) zerolog.Logger {
-	// Set logger level field to severity for stack driver support
-	zerolog.LevelFieldName = "severity"
-	var w io.Writer = os.Stdout
-	if useConsole {
-		w = zerolog.ConsoleWriter{
-			Out: os.Stdout,
-		}
-	}
-	// Parse level from config
-	lvl, err := zerolog.ParseLevel(logLevel)
-	if err != nil {
-		lvl = zerolog.InfoLevel
-	}
-	// Override level with verbose
-	if makeVerbose {
-		lvl = zerolog.DebugLevel
-	}
-	return zerolog.New(w).Level(lvl).With().Fields(map[string]interface{}{
-		"version": version.Version,
-		"app":     "cache-service",
-	}).Timestamp().Logger()
+	return cmd
 }
