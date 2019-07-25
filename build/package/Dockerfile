@@ -28,6 +28,6 @@ RUN apk update \
 	&& adduser -D -H -G cache-service cache-service
 COPY --from=builder /usr/src/cache-service/cache-service /usr/bin/cache-service
 VOLUME ["/etc/cache-service"]
-ENTRYPOINT ["cache-service"]
+ENTRYPOINT ["cache-service", "server"]
 EXPOSE 3000
 USER cache-service

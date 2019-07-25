@@ -33,7 +33,7 @@ func rootCmd() *cobra.Command {
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Setup default logger
-			log = initLogger(logLevel, useConsole , makeVerbose)
+			log = initLogger(logLevel, useConsole, makeVerbose)
 			return nil
 		},
 	}
@@ -42,8 +42,12 @@ func rootCmd() *cobra.Command {
 	pflags.BoolVar(&useConsole, "console", useConsole, "use console log writer")
 	pflags.BoolVarP(&makeVerbose, "verbose", "v", makeVerbose, "verbose logging")
 	pflags.StringVar(&logLevel, "log-level", logLevel, "log level")
+
 	// Add sub commands
 	registerVersionCommand(cmd)
+	registerServerCommand(cmd)
+	registerClientCommand(cmd)
+
 	return cmd
 }
 
