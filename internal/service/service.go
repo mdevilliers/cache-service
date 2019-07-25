@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	proto "github.com/mdevilliers/cache-service/proto/v1"
@@ -14,12 +15,19 @@ type service struct {
 	client store
 }
 
+// store allows the mocking of the underlying client
 type store interface {
 	Set(string, string, time.Duration) error
 	Get(string) (string, error)
 	RandomKey() (string, error)
 	Del(string) error
 }
+
+var (
+	ErrNoKeySupplied     = errors.New("no key supplied")
+	ErrNoContentSupplied = errors.New("no content supplied")
+	ErrNoCountSupplied   = errors.New("no count supplied")
+)
 
 func NewCacheService(logger zerolog.Logger, client store) *service {
 	return &service{
@@ -29,6 +37,28 @@ func NewCacheService(logger zerolog.Logger, client store) *service {
 }
 
 func (s *service) Set(ctx context.Context, req *proto.SetRequest) (*proto.SetResponse, error) {
+
+	if req.GetKey() == "" {
+		return &proto.SetResponse{
+			Status: &proto.Status{
+				Ok: false,
+				Error: &proto.Error{
+					Message: ErrNoKeySupplied.Error(),
+					Code:    proto.ErrorCode_KEY_NOT_SUPPLIED,
+				},
+			}}, nil
+	}
+
+	if req.GetContents() == "" {
+		return &proto.SetResponse{
+			Status: &proto.Status{
+				Ok: false,
+				Error: &proto.Error{
+					Message: ErrNoContentSupplied.Error(),
+					Code:    proto.ErrorCode_CONTENT_NOT_SUPPLIED,
+				},
+			}}, nil
+	}
 
 	err := s.client.Set(req.GetKey(), req.GetContents(), time.Second*time.Duration(req.GetTtl()))
 
@@ -44,7 +74,7 @@ func (s *service) Set(ctx context.Context, req *proto.SetRequest) (*proto.SetRes
 					Code:    proto.ErrorCode_UNKNOWN_ERROR,
 				},
 			},
-		}, err
+		}, nil
 	}
 
 	return &proto.SetResponse{
@@ -54,6 +84,17 @@ func (s *service) Set(ctx context.Context, req *proto.SetRequest) (*proto.SetRes
 	}, nil
 }
 func (s *service) GetByKey(ctx context.Context, req *proto.GetByKeyRequest) (*proto.GetByKeyResponse, error) {
+
+	if req.GetKey() == "" {
+		return &proto.GetByKeyResponse{
+			Status: &proto.Status{
+				Ok: false,
+				Error: &proto.Error{
+					Message: ErrNoKeySupplied.Error(),
+					Code:    proto.ErrorCode_KEY_NOT_SUPPLIED,
+				},
+			}}, nil
+	}
 
 	value, err := s.client.Get(req.GetKey())
 
@@ -69,7 +110,7 @@ func (s *service) GetByKey(ctx context.Context, req *proto.GetByKeyRequest) (*pr
 					Code:    proto.ErrorCode_UNKNOWN_ERROR,
 				},
 			},
-		}, err
+		}, nil
 	}
 
 	return &proto.GetByKeyResponse{
@@ -82,6 +123,17 @@ func (s *service) GetByKey(ctx context.Context, req *proto.GetByKeyRequest) (*pr
 
 }
 func (s *service) GetRandomN(ctx context.Context, req *proto.GetRandomNRequest) (*proto.GetRandomNResponse, error) {
+
+	if req.GetCount() == 0 {
+		return &proto.GetRandomNResponse{
+			Status: &proto.Status{
+				Ok: false,
+				Error: &proto.Error{
+					Message: ErrNoCountSupplied.Error(),
+					Code:    proto.ErrorCode_COUNT_NOT_SUPPLIED,
+				},
+			}}, nil
+	}
 
 	keys := []string{}
 
@@ -101,7 +153,7 @@ func (s *service) GetRandomN(ctx context.Context, req *proto.GetRandomNRequest) 
 						Code:    proto.ErrorCode_UNKNOWN_ERROR,
 					},
 				},
-			}, err
+			}, nil
 
 		}
 
@@ -118,6 +170,17 @@ func (s *service) GetRandomN(ctx context.Context, req *proto.GetRandomNRequest) 
 }
 func (s *service) Purge(ctx context.Context, req *proto.PurgeRequest) (*proto.PurgeResponse, error) {
 
+	if req.GetKey() == "" {
+		return &proto.PurgeResponse{
+			Status: &proto.Status{
+				Ok: false,
+				Error: &proto.Error{
+					Message: ErrNoKeySupplied.Error(),
+					Code:    proto.ErrorCode_KEY_NOT_SUPPLIED,
+				},
+			}}, nil
+	}
+
 	err := s.client.Del(req.GetKey())
 
 	if err != nil {
@@ -132,7 +195,7 @@ func (s *service) Purge(ctx context.Context, req *proto.PurgeRequest) (*proto.Pu
 					Code:    proto.ErrorCode_UNKNOWN_ERROR,
 				},
 			},
-		}, err
+		}, nil
 	}
 
 	return &proto.PurgeResponse{
