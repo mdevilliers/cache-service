@@ -122,6 +122,7 @@ proto:
 .PHONY: proto_verify
 # verify proto binding has been generated
 # The CI will check that no un-generated files have been checked in
+# TODO : add stages in CI to check
 proto_verify: proto
 	git diff --exit-code
 
