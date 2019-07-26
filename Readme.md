@@ -2,9 +2,15 @@
 
 [![CircleCI](https://circleci.com/gh/mdevilliers/cache-service.svg?style=svg)](https://circleci.com/gh/mdevilliers/cache-service)
 
-POC of a caching service with a GRPC API.
+POC of a caching service with a GRPC API using Redis as a backing store.
 
 ### Local developement
+
+To run a local copy of redis :
+
+```
+make hack_local_redis
+```
 
 To update the generated protobuf files :
 
@@ -13,7 +19,7 @@ make install_proto_tools
 make proto
 ```
 
-To generate the mocks
+To generate the mocks :
 
 ```
 make mocks
