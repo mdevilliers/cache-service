@@ -23,7 +23,10 @@ DOCKER_REGISTRY := mdevilliers
 
 # Docker Tag from Git
 DOCKER_IMAGE_TAG  ?= ${GIT_TAG}_$(GIT_SHA)_$(GIT_DIRTY)
-DOCKER_BUILD_CMD := $(GO_BUILD_VARS) $(GO_BUILD) $(GO_BUILD_FLAGS) -o docker/$(EXE_NAME) github.com/mdevilliers/cache-service/cmd/cache-service
+DOCKER_BUILD_CMD:=
+DOCKER_BUILD_CMD+= $(GO_BUILD_VARS) $(GO_BUILD) $(GO_BUILD_FLAGS)
+DOCKER_BUILD_CMD+= -o docker/$(EXE_NAME)
+DOCKER_BUILD_CMD+= github.com/mdevilliers/cache-service/cmd/cache-service
 
 # LDFlags
 LDFLAGS += -X $(PKG)/internal/version.Timestamp=$(shell date +%s)
