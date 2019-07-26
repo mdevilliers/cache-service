@@ -38,7 +38,7 @@ func (s *server) Start(address string) error {
 	}
 
 	serv := grpc.NewServer(
-		// clients should reconnect regulary so we can loadbalace effectively
+		// clients should reconnect regularly so we can loadbalace effectively
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionAge: 2 * time.Minute}),
 	)
 	s.grpcServer = serv

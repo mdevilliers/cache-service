@@ -17,13 +17,15 @@ func registerClientCommand(root *cobra.Command) {
 
 	cmd := &cobra.Command{
 		Use:   "client",
-		Short: "Client to excercise the service",
+		Short: "Client to exercise the service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			conn, err := grpc.Dial(address, grpc.WithInsecure())
 			if err != nil {
 				return errors.Wrap(err, "error connecting to endpoint")
 			}
+
+			// nolint: errcheck
 			defer conn.Close()
 
 			client := proto.NewCacheClient(conn)
@@ -66,6 +68,7 @@ func registerClientCommand(root *cobra.Command) {
 
 			for i := 0; i < 100; i++ {
 
+				// nolint: govet
 				_, err := client.Set(ctx, &proto.SetRequest{
 					Key:      fmt.Sprintf("foo:%d", rand.Intn(10000)),
 					Contents: "hello",
