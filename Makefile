@@ -1,5 +1,3 @@
-
-
 CMD      := cache-service
 PKG      := github.com/mdevilliers/cache-service
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
@@ -26,10 +24,8 @@ DOCKER_REGISTRY := mdevilliers
 # Docker Tag from Git
 DOCKER_IMAGE_TAG  ?= ${GIT_TAG}_$(GIT_SHA)_$(GIT_DIRTY)
 DOCKER_BUILD_CMD := $(GO_BUILD_VARS) $(GO_BUILD) $(GO_BUILD_FLAGS) -o docker/$(EXE_NAME) github.com/mdevilliers/cache-service/cmd/cache-service
-DOCKER_PACKAGE_CMD := docker build -t $(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG) -t $(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME):latest docker/
 
 # LDFlags
-# LDFLAGS := -w -s
 LDFLAGS += -X $(PKG)/internal/version.Timestamp=$(shell date +%s)
 LDFLAGS += -X $(PKG)/internal/version.GitCommit=${GIT_COMMIT}
 LDFLAGS += -X $(PKG)/internal/version.GitTreeState=${GIT_DIRTY}
@@ -71,18 +67,20 @@ build: GOBUILDFLAGS += -ldflags '$(LDFLAGS)'
 build:
 	@CGO_ENABLED=$(CGO) go build $(GOBUILDFLAGS) $(CMD)
 
+DOCKER_ARGS:=
+DOCKER_ARGS+= --force-rm
+DOCKER_ARGS+= --build-arg BIN_VERSION=$(BIN_VERSION)
+DOCKER_ARGS+= --build-arg GIT_COMMIT=$(GIT_COMMIT)
+DOCKER_ARGS+= --build-arg GIT_SHA=$(GIT_SHA)
+DOCKER_ARGS+= --build-arg GIT_TAG=$(GIT_TAG)
+DOCKER_ARGS+= --build-arg GIT_DIRTY=$(GIT_DIRTY)
+DOCKER_ARGS+= -f ./build/package/Dockerfile
+DOCKER_ARGS+= -t $(DOCKER_REGISTRY)/$(CMD):$(DOCKER_IMAGE_TAG)
+
 # Build docker image
 .PHONY: image
 image:
-	docker build \
-		--force-rm \
-		--build-arg BIN_VERSION=$(BIN_VERSION) \
-		--build-arg GIT_COMMIT=$(GIT_COMMIT) \
-		--build-arg GIT_SHA=$(GIT_SHA) \
-		--build-arg GIT_TAG=$(GIT_TAG) \
-		--build-arg GIT_DIRTY=$(GIT_DIRTY) \
-		-f ./build/package/Dockerfile \
-		-t $(DOCKER_REGISTRY)/$(CMD):$(DOCKER_IMAGE_TAG) .
+	docker build $(DOCKER_ARGS) .
 
 .PHONY: test
 # Run test suite
@@ -149,3 +147,8 @@ hack_image_deploy_local: image deploy
 	kind load docker-image $(DOCKER_REGISTRY)/$(CMD):$(DOCKER_IMAGE_TAG)
 	kubectl set image deployment/cache-service-deployment cache-service=$(DOCKER_REGISTRY)/cache-service:$(DOCKER_IMAGE_TAG)
 	kubectl patch -f ./k8s/cache-service_deployment.yaml -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+
+.PHONY: hack_local_redis
+# task to run a local redis instace for development
+hack_local_redis:
+	docker run --rm -p 6379:6379 -d redis:5.0.5
