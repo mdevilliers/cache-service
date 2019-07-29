@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/go-redis/redis"
 	"github.com/heptiolabs/healthcheck"
 	"github.com/mdevilliers/cache-service/internal/env"
 	"github.com/mdevilliers/cache-service/internal/server"
@@ -27,19 +26,14 @@ func registerServerCommand(root *cobra.Command) {
 
 			version.Write(os.Stdout)
 
-			redisServer := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_HOST", "0.0.0.0")
-			redisPort := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_PORT", "6379")
-
-			redisClient := redis.NewClient(&redis.Options{
-				Addr: fmt.Sprintf("%s:%s", redisServer, redisPort),
-			})
+			store := store.NewFromEnvironment(log)
 
 			port := env.FromEnvWithDefaultStr("PORT", "3000")
 			binding := fmt.Sprintf(":%s", port)
 
-			go configureHealthChecks(log, redisClient)
+			go configureHealthChecks(log, store)
 
-			serv := service.NewCacheService(log, store.NewRedisStore(redisClient))
+			serv := service.NewCacheService(log, store)
 
 			server := server.New(log, serv)
 
@@ -63,7 +57,14 @@ func registerServerCommand(root *cobra.Command) {
 	root.AddCommand(cmd)
 }
 
-func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
+// healthCheckable constrains the type accepted to the registerHealthChecks to
+// instances that implement a Readiness and a Liveness probe
+type healthCheckable interface {
+	ReadinessCheck() (string, func() error)
+	LivenessCheck() (string, func() error)
+}
+
+func configureHealthChecks(logger zerolog.Logger, healthCheckables ...healthCheckable) {
 
 	health := healthcheck.NewHandler()
 
@@ -83,16 +84,14 @@ func configureHealthChecks(logger zerolog.Logger, redisClient *redis.Client) {
 
 	})
 
-	// cache-service is only ready if it can reach redis
-	health.AddReadinessCheck("redis-service-check", func() error {
-		_, err := redisClient.Ping().Result()
+	for _, h := range healthCheckables {
 
-		if err != nil {
-			logger.Err(err).Msg("failed to ping redis")
-		}
+		key, f := h.LivenessCheck()
+		health.AddLivenessCheck(key, f)
 
-		return err
-	})
+		key, f = h.ReadinessCheck()
+		health.AddReadinessCheck(key, f)
+	}
 
 	// nolint : errcheck
 	go http.ListenAndServe(":8086", health)
