@@ -154,4 +154,4 @@ hack_image_deploy_local: image deploy
 .PHONY: hack_local_redis
 # task to run a local redis instace for development
 hack_local_redis:
-	docker run --rm -p 6379:6379 -d redis:5.0.5
+	docker run --rm -p 6379:6379 -d redis:3.2.9
