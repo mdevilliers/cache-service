@@ -80,6 +80,7 @@ func registerClientCommand(root *cobra.Command) {
 
 			}
 
+			// GetRandomN will ask the slave nodes for results - beware of the replication lag
 			randomNResponse, err := client.GetRandomN(ctx, &proto.GetRandomNRequest{
 				Count: 10,
 			})
