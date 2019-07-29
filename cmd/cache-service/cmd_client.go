@@ -13,7 +13,7 @@ import (
 
 func registerClientCommand(root *cobra.Command) {
 
-	var address string
+	address := "0.0.0.0:3000"
 
 	cmd := &cobra.Command{
 		Use:   "client",
