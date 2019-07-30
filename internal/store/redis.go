@@ -23,15 +23,21 @@ func NewFromEnvironment(logger zerolog.Logger) *redisstore {
 	masterRedisServer := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_HOST", "0.0.0.0")
 	masterRedisPort := env.FromEnvWithDefaultStr("REDIS_MASTER_SERVICE_PORT", "6379")
 
+	// TODO : get from file
+	// garden.io doesn't support secrets as volumns
+	password := env.FromEnvWithDefaultStr("REDIS_PASSWORD", "")
+
 	masterRedisClient := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%s", masterRedisServer, masterRedisPort),
+		Addr:     fmt.Sprintf("%s:%s", masterRedisServer, masterRedisPort),
+		Password: password,
 	})
 
 	slaveRedisServer := env.FromEnvWithDefaultStr("REDIS_SLAVE_SERVICE_HOST", "0.0.0.0")
 	slaveRedisPort := env.FromEnvWithDefaultStr("REDIS_SLAVE_SERVICE_PORT", "6379")
 
 	slaveRedisClient := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%s", slaveRedisServer, slaveRedisPort),
+		Addr:     fmt.Sprintf("%s:%s", slaveRedisServer, slaveRedisPort),
+		Password: password,
 	})
 
 	return &redisstore{

@@ -22,11 +22,27 @@ services:
         servicePort: 3000
     ingresses:
       - port: grpc
+    env:
+      REDIS_PASSWORD:
+        secretRef:
+          name: redis-password-secret
+          key: redis-password
+    dependencies:
+      - redis
 ---
 kind: Module
 name: redis
 description: redis server
 type: helm
-chart: stable/redis-ha
+chart: stable/redis
 values:
-  hardAntiAffinity : false
+  existingSecret: redis-password-secret
+  usePasswordFile: true
+  usePassword: true
+---
+kind: Module
+name: redis-secret
+description: redis secret
+type: kubernetes
+files:
+  - ./k8s/redis-secret.yaml
