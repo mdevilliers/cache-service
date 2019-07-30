@@ -24,19 +24,9 @@ services:
       - port: grpc
 ---
 kind: Module
-description: Ambassador API Gateway
+name: redis
+description: redis server
 type: helm
-name: ambassador
-chart: stable/ambassador
+chart: stable/redis-ha
 values:
-  service:
-    annotations:
-      getambassador.io/config: |
-        ---
-        apiVersion: ambassador/v1
-        kind: Module
-        name: ambassador
-        config:
-          service_port: 8080 # Set port since the default ingress already occupies the default port
-    http:
-      port: 8080 # Set port since the default ingress already occupies the default port
+  hardAntiAffinity : false
