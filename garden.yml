@@ -7,8 +7,8 @@ environments:
         setupIngressController: false
 ---
 kind: Module
-description: cache service server
-name: cache-service-server
+description: cache service
+name: cache-service
 type: container
 dockerfile: ./build/package/Dockerfile
 services:
@@ -25,10 +25,14 @@ services:
     env:
       REDIS_PASSWORD:
         secretRef:
-          name: redis-password-secret
+          name: cache-service-secret
           key: redis-password
     dependencies:
       - redis
+    healthcheck:
+      httpGet:
+        path: /live
+        port: 8086
 ---
 kind: Module
 name: redis
@@ -36,13 +40,13 @@ description: redis server
 type: helm
 chart: stable/redis
 values:
-  existingSecret: redis-password-secret
+  existingSecret: cache-service-secret
   usePasswordFile: true
   usePassword: true
 ---
 kind: Module
-name: redis-secret
-description: redis secret
+name: cache-service-secret
+description: secrets for the cache service
 type: kubernetes
 files:
-  - ./k8s/redis-secret.yaml
+  - ./k8s/cache-service-secret.yaml
