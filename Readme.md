@@ -4,7 +4,7 @@
 
 POC of a caching service with a GRPC API using Redis as a backing store.
 
-### Local developement
+### Local development
 
 To run a local copy of redis :
 
