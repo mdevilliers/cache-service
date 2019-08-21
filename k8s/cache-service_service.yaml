@@ -7,6 +7,6 @@ spec:
     app: cache-service
   ports:
     - name: http
+      protocol: TCP
       targetPort: 3000
       port: 8080
-      protocol: TCP
