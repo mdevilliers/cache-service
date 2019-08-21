@@ -1,6 +1,7 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,6 +15,10 @@ type redisstore struct {
 	rClient  *redis.Client
 	logger   zerolog.Logger
 }
+
+var (
+	ErrItemNotFound = errors.New("item not found")
+)
 
 // NewFromEnvironmet creates a store using K8s overrides to locate a
 // Read / Write client for Set, Get and Del
@@ -46,7 +51,14 @@ func (r *redisstore) Set(key string, contents string, ttl time.Duration) error {
 }
 
 func (r *redisstore) Get(key string) (string, error) {
-	return r.rwClient.Get(key).Result()
+	result, err := r.rwClient.Get(key).Result()
+
+	if err != nil && err == redis.Nil {
+		return "", ErrItemNotFound
+	}
+
+	return result, err
+
 }
 
 func (r *redisstore) RandomKey() (string, error) {

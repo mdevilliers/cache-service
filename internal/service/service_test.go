@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/mdevilliers/cache-service/internal/service/mocks"
+	"github.com/mdevilliers/cache-service/internal/store"
 	proto "github.com/mdevilliers/cache-service/proto/v1"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -67,7 +68,6 @@ func Test_Cache(t *testing.T) {
 				require.False(t, response.GetStatus().Ok)
 				require.Equal(t, tc.err.Error(), response.GetStatus().GetError().GetMessage())
 				require.Equal(t, tc.errCode, response.GetStatus().GetError().GetCode())
-
 			}
 		},
 		)
@@ -88,10 +88,12 @@ func Test_GetByKey(t *testing.T) {
 		errCode  proto.ErrorCode
 		err      error
 		storeErr error
+		statusOK bool
 	}{
 		{
-			name:    "ok",
-			request: &proto.GetByKeyRequest{Key: "foo"},
+			name:     "ok",
+			request:  &proto.GetByKeyRequest{Key: "foo"},
+			statusOK: true,
 		},
 		{
 			name:    "no key",
@@ -106,6 +108,13 @@ func Test_GetByKey(t *testing.T) {
 			err:      errors.New("boom"),
 			storeErr: errors.New("boom"),
 		},
+		{
+			name:     "item not found",
+			request:  &proto.GetByKeyRequest{Key: "foo"},
+			errCode:  proto.ErrorCode_KEY_NOT_FOUND,
+			statusOK: true, // NOT FOUND is not an error
+			storeErr: store.ErrItemNotFound,
+		},
 	}
 
 	for i := range testCases {
@@ -118,14 +127,12 @@ func Test_GetByKey(t *testing.T) {
 
 			if tc.err == nil {
 				require.Nil(t, err)
-				require.True(t, response.GetStatus().Ok)
 
 			} else {
-				require.False(t, response.GetStatus().Ok)
 				require.Equal(t, tc.err.Error(), response.GetStatus().GetError().GetMessage())
 				require.Equal(t, tc.errCode, response.GetStatus().GetError().GetCode())
-
 			}
+			require.Equal(t, tc.statusOK, response.GetStatus().GetOk())
 		},
 		)
 	}
