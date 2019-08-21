@@ -5,18 +5,18 @@ import (
 	"errors"
 	"time"
 
+	"github.com/mdevilliers/cache-service/internal/store"
 	proto "github.com/mdevilliers/cache-service/proto/v1"
-
 	"github.com/rs/zerolog"
 )
 
 type service struct {
 	logger zerolog.Logger
-	client store
+	client storer
 }
 
 // store allows the mocking of the underlying client
-type store interface {
+type storer interface {
 	Set(string, string, time.Duration) error
 	Get(string) (string, error)
 	RandomKey() (string, error)
@@ -29,7 +29,7 @@ var (
 	ErrNoCountSupplied   = errors.New("no count supplied")
 )
 
-func NewCacheService(logger zerolog.Logger, client store) *service {
+func NewCacheService(logger zerolog.Logger, client storer) *service {
 	return &service{
 		logger: logger,
 		client: client,
@@ -99,6 +99,20 @@ func (s *service) GetByKey(ctx context.Context, req *proto.GetByKeyRequest) (*pr
 	value, err := s.client.Get(req.GetKey())
 
 	if err != nil {
+
+		if err == store.ErrItemNotFound {
+
+			return &proto.GetByKeyResponse{
+				Status: &proto.Status{
+					Ok: true,
+					Error: &proto.Error{
+						Message: err.Error(),
+						Code:    proto.ErrorCode_KEY_NOT_FOUND,
+					},
+				},
+			}, nil
+
+		}
 
 		s.logger.Err(err).Msg("error getting item")
 
