@@ -116,6 +116,12 @@ func registerClientCommand(root *cobra.Command) {
 
 			fmt.Println("no content set : ", setResponse)
 
+			doesnotExist, err := client.GetByKey(ctx, &proto.GetByKeyRequest{
+				Key: "does-not-exist",
+			})
+
+			fmt.Println("!", doesnotExist, err)
+
 			return nil
 		},
 	}
