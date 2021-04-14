@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-svc:
     docker:
-      - image: circleci/golang:1.12.7
+      - image: circleci/golang:1.16
     steps:
       - checkout
       - run: make lint
@@ -10,7 +10,7 @@ jobs:
       - run: make build
   make-release-image:
     docker:
-      - image: circleci/golang:1.12.7
+      - image: circleci/golang:1.16
     # TODO : implement make-release-image
     # Maybe this would be
     #  - a github release
