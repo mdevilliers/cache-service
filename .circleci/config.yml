@@ -5,8 +5,8 @@ jobs:
       - image: circleci/golang:1.16
     steps:
       - checkout
-      - run: make lint
       - run: make test
+      - run: make lint
       - run: make build
   make-release-image:
     docker:
