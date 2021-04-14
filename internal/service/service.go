@@ -100,7 +100,7 @@ func (s *service) GetByKey(ctx context.Context, req *proto.GetByKeyRequest) (*pr
 
 	if err != nil {
 
-		if err == store.ErrItemNotFound {
+		if errors.Is(err, store.ErrItemNotFound) {
 
 			return &proto.GetByKeyResponse{
 				Status: &proto.Status{

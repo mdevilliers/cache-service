@@ -72,7 +72,7 @@ func configureHealthChecks(logger zerolog.Logger, healthCheckables ...healthChec
 	// This is only here for demonstration purposes
 	health.AddLivenessCheck("random-failure", func() error {
 
-		r := rand.Intn(1000)
+		r := rand.Intn(1000) //nolint: gosec
 
 		logger.Info().Fields(map[string]interface{}{
 			"random": r,

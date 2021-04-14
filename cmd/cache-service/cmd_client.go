@@ -70,7 +70,7 @@ func registerClientCommand(root *cobra.Command) {
 
 				// nolint: govet
 				_, err := client.Set(ctx, &proto.SetRequest{
-					Key:      fmt.Sprintf("foo:%d", rand.Intn(10000)),
+					Key:      fmt.Sprintf("foo:%d", rand.Intn(10000)), // nolint: gosec
 					Contents: "hello",
 				})
 
@@ -90,7 +90,7 @@ func registerClientCommand(root *cobra.Command) {
 			}
 
 			for n, i := range randomNResponse.GetKeys() {
-				fmt.Println(fmt.Sprintf("%d : %s", n, i))
+				fmt.Printf("%d : %s/n", n, i)
 			}
 
 			fmt.Println("sad path")
