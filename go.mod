@@ -13,6 +13,6 @@ require (
 	github.com/rs/zerolog v1.21.0
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/pflag v1.0.3 // indirect
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.37.0
 )
