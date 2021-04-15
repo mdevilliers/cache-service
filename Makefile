@@ -88,10 +88,7 @@ image:
 .PHONY: test
 # Run test suite
 test:
-ifeq ("$(wildcard $(shell which gocov))","")
-	go get github.com/axw/gocov/gocov
-endif
-	gocov test ${PKG_LIST} | gocov report
+	go test -v ./...
 
 # deploys to configured kubernetes instance
 .PHONY: deploy
