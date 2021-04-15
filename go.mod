@@ -8,7 +8,7 @@ require (
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.0.0 // indirect
 	github.com/rs/zerolog v1.14.3
 	github.com/spf13/cobra v0.0.7
