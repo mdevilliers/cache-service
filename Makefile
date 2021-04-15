@@ -43,7 +43,7 @@ GOBUILDFLAGS += -o $(BIN_OUTDIR)/$(BIN_NAME)
 
 # Linting
 OS := $(shell uname)
-GOLANGCI_LINT_VERSION=1.16.0
+GOLANGCI_LINT_VERSION=1.37.1
 ifeq ($(OS),Darwin)
 	GOLANGCI_LINT_ARCHIVE=golangci-lint-$(GOLANGCI_LINT_VERSION)-darwin-amd64.tar.gz
 else
@@ -88,10 +88,7 @@ image:
 .PHONY: test
 # Run test suite
 test:
-ifeq ("$(wildcard $(shell which gocov))","")
-	go get github.com/axw/gocov/gocov
-endif
-	gocov test ${PKG_LIST} | gocov report
+	go test -v ./...
 
 # deploys to configured kubernetes instance
 .PHONY: deploy

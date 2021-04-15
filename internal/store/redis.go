@@ -53,7 +53,7 @@ func (r *redisstore) Set(key string, contents string, ttl time.Duration) error {
 func (r *redisstore) Get(key string) (string, error) {
 	result, err := r.rwClient.Get(key).Result()
 
-	if err != nil && err == redis.Nil {
+	if err != nil && errors.Is(err, redis.Nil) {
 		return "", ErrItemNotFound
 	}
 
