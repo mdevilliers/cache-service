@@ -9,7 +9,7 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.0.0 // indirect
-	github.com/rs/zerolog v1.23.0
+	github.com/rs/zerolog v1.24.0
 	github.com/spf13/cobra v0.0.7
 	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.40.0
