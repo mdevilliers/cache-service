@@ -12,6 +12,6 @@ require (
 	github.com/rs/zerolog v1.25.0
 	github.com/spf13/cobra v0.0.7
 	github.com/stretchr/testify v1.7.0
-	google.golang.org/grpc v1.40.0
+	google.golang.org/grpc v1.41.0
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 )
