@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func registerClientCommand(root *cobra.Command) {
@@ -20,7 +21,7 @@ func registerClientCommand(root *cobra.Command) {
 		Short: "Client to exercise the service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			conn, err := grpc.Dial(address, grpc.WithInsecure())
+			conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				return errors.Wrap(err, "error connecting to endpoint")
 			}
