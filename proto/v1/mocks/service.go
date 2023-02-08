@@ -82,15 +82,16 @@ func (fake *FakeCacheClient) GetByKey(arg1 context.Context, arg2 *cacheservice_v
 		arg2 *cacheservice_v1.GetByKeyRequest
 		arg3 []grpc.CallOption
 	}{arg1, arg2, arg3})
+	stub := fake.GetByKeyStub
+	fakeReturns := fake.getByKeyReturns
 	fake.recordInvocation("GetByKey", []interface{}{arg1, arg2, arg3})
 	fake.getByKeyMutex.Unlock()
-	if fake.GetByKeyStub != nil {
-		return fake.GetByKeyStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getByKeyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -147,15 +148,16 @@ func (fake *FakeCacheClient) GetRandomN(arg1 context.Context, arg2 *cacheservice
 		arg2 *cacheservice_v1.GetRandomNRequest
 		arg3 []grpc.CallOption
 	}{arg1, arg2, arg3})
+	stub := fake.GetRandomNStub
+	fakeReturns := fake.getRandomNReturns
 	fake.recordInvocation("GetRandomN", []interface{}{arg1, arg2, arg3})
 	fake.getRandomNMutex.Unlock()
-	if fake.GetRandomNStub != nil {
-		return fake.GetRandomNStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getRandomNReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -212,15 +214,16 @@ func (fake *FakeCacheClient) Purge(arg1 context.Context, arg2 *cacheservice_v1.P
 		arg2 *cacheservice_v1.PurgeRequest
 		arg3 []grpc.CallOption
 	}{arg1, arg2, arg3})
+	stub := fake.PurgeStub
+	fakeReturns := fake.purgeReturns
 	fake.recordInvocation("Purge", []interface{}{arg1, arg2, arg3})
 	fake.purgeMutex.Unlock()
-	if fake.PurgeStub != nil {
-		return fake.PurgeStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.purgeReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -277,15 +280,16 @@ func (fake *FakeCacheClient) Set(arg1 context.Context, arg2 *cacheservice_v1.Set
 		arg2 *cacheservice_v1.SetRequest
 		arg3 []grpc.CallOption
 	}{arg1, arg2, arg3})
+	stub := fake.SetStub
+	fakeReturns := fake.setReturns
 	fake.recordInvocation("Set", []interface{}{arg1, arg2, arg3})
 	fake.setMutex.Unlock()
-	if fake.SetStub != nil {
-		return fake.SetStub(arg1, arg2, arg3...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.setReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

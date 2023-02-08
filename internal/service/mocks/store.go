@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type FakeStore struct {
+type FakeStorer struct {
 	DelStub        func(string) error
 	delMutex       sync.RWMutex
 	delArgsForCall []struct {
@@ -60,44 +60,45 @@ type FakeStore struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeStore) Del(arg1 string) error {
+func (fake *FakeStorer) Del(arg1 string) error {
 	fake.delMutex.Lock()
 	ret, specificReturn := fake.delReturnsOnCall[len(fake.delArgsForCall)]
 	fake.delArgsForCall = append(fake.delArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.DelStub
+	fakeReturns := fake.delReturns
 	fake.recordInvocation("Del", []interface{}{arg1})
 	fake.delMutex.Unlock()
-	if fake.DelStub != nil {
-		return fake.DelStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.delReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeStore) DelCallCount() int {
+func (fake *FakeStorer) DelCallCount() int {
 	fake.delMutex.RLock()
 	defer fake.delMutex.RUnlock()
 	return len(fake.delArgsForCall)
 }
 
-func (fake *FakeStore) DelCalls(stub func(string) error) {
+func (fake *FakeStorer) DelCalls(stub func(string) error) {
 	fake.delMutex.Lock()
 	defer fake.delMutex.Unlock()
 	fake.DelStub = stub
 }
 
-func (fake *FakeStore) DelArgsForCall(i int) string {
+func (fake *FakeStorer) DelArgsForCall(i int) string {
 	fake.delMutex.RLock()
 	defer fake.delMutex.RUnlock()
 	argsForCall := fake.delArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeStore) DelReturns(result1 error) {
+func (fake *FakeStorer) DelReturns(result1 error) {
 	fake.delMutex.Lock()
 	defer fake.delMutex.Unlock()
 	fake.DelStub = nil
@@ -106,7 +107,7 @@ func (fake *FakeStore) DelReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeStore) DelReturnsOnCall(i int, result1 error) {
+func (fake *FakeStorer) DelReturnsOnCall(i int, result1 error) {
 	fake.delMutex.Lock()
 	defer fake.delMutex.Unlock()
 	fake.DelStub = nil
@@ -120,44 +121,45 @@ func (fake *FakeStore) DelReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeStore) Get(arg1 string) (string, error) {
+func (fake *FakeStorer) Get(arg1 string) (string, error) {
 	fake.getMutex.Lock()
 	ret, specificReturn := fake.getReturnsOnCall[len(fake.getArgsForCall)]
 	fake.getArgsForCall = append(fake.getArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetStub
+	fakeReturns := fake.getReturns
 	fake.recordInvocation("Get", []interface{}{arg1})
 	fake.getMutex.Unlock()
-	if fake.GetStub != nil {
-		return fake.GetStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeStore) GetCallCount() int {
+func (fake *FakeStorer) GetCallCount() int {
 	fake.getMutex.RLock()
 	defer fake.getMutex.RUnlock()
 	return len(fake.getArgsForCall)
 }
 
-func (fake *FakeStore) GetCalls(stub func(string) (string, error)) {
+func (fake *FakeStorer) GetCalls(stub func(string) (string, error)) {
 	fake.getMutex.Lock()
 	defer fake.getMutex.Unlock()
 	fake.GetStub = stub
 }
 
-func (fake *FakeStore) GetArgsForCall(i int) string {
+func (fake *FakeStorer) GetArgsForCall(i int) string {
 	fake.getMutex.RLock()
 	defer fake.getMutex.RUnlock()
 	argsForCall := fake.getArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeStore) GetReturns(result1 string, result2 error) {
+func (fake *FakeStorer) GetReturns(result1 string, result2 error) {
 	fake.getMutex.Lock()
 	defer fake.getMutex.Unlock()
 	fake.GetStub = nil
@@ -167,7 +169,7 @@ func (fake *FakeStore) GetReturns(result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *FakeStore) GetReturnsOnCall(i int, result1 string, result2 error) {
+func (fake *FakeStorer) GetReturnsOnCall(i int, result1 string, result2 error) {
 	fake.getMutex.Lock()
 	defer fake.getMutex.Unlock()
 	fake.GetStub = nil
@@ -183,36 +185,37 @@ func (fake *FakeStore) GetReturnsOnCall(i int, result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *FakeStore) RandomKey() (string, error) {
+func (fake *FakeStorer) RandomKey() (string, error) {
 	fake.randomKeyMutex.Lock()
 	ret, specificReturn := fake.randomKeyReturnsOnCall[len(fake.randomKeyArgsForCall)]
 	fake.randomKeyArgsForCall = append(fake.randomKeyArgsForCall, struct {
 	}{})
+	stub := fake.RandomKeyStub
+	fakeReturns := fake.randomKeyReturns
 	fake.recordInvocation("RandomKey", []interface{}{})
 	fake.randomKeyMutex.Unlock()
-	if fake.RandomKeyStub != nil {
-		return fake.RandomKeyStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.randomKeyReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeStore) RandomKeyCallCount() int {
+func (fake *FakeStorer) RandomKeyCallCount() int {
 	fake.randomKeyMutex.RLock()
 	defer fake.randomKeyMutex.RUnlock()
 	return len(fake.randomKeyArgsForCall)
 }
 
-func (fake *FakeStore) RandomKeyCalls(stub func() (string, error)) {
+func (fake *FakeStorer) RandomKeyCalls(stub func() (string, error)) {
 	fake.randomKeyMutex.Lock()
 	defer fake.randomKeyMutex.Unlock()
 	fake.RandomKeyStub = stub
 }
 
-func (fake *FakeStore) RandomKeyReturns(result1 string, result2 error) {
+func (fake *FakeStorer) RandomKeyReturns(result1 string, result2 error) {
 	fake.randomKeyMutex.Lock()
 	defer fake.randomKeyMutex.Unlock()
 	fake.RandomKeyStub = nil
@@ -222,7 +225,7 @@ func (fake *FakeStore) RandomKeyReturns(result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *FakeStore) RandomKeyReturnsOnCall(i int, result1 string, result2 error) {
+func (fake *FakeStorer) RandomKeyReturnsOnCall(i int, result1 string, result2 error) {
 	fake.randomKeyMutex.Lock()
 	defer fake.randomKeyMutex.Unlock()
 	fake.RandomKeyStub = nil
@@ -238,7 +241,7 @@ func (fake *FakeStore) RandomKeyReturnsOnCall(i int, result1 string, result2 err
 	}{result1, result2}
 }
 
-func (fake *FakeStore) Set(arg1 string, arg2 string, arg3 time.Duration) error {
+func (fake *FakeStorer) Set(arg1 string, arg2 string, arg3 time.Duration) error {
 	fake.setMutex.Lock()
 	ret, specificReturn := fake.setReturnsOnCall[len(fake.setArgsForCall)]
 	fake.setArgsForCall = append(fake.setArgsForCall, struct {
@@ -246,38 +249,39 @@ func (fake *FakeStore) Set(arg1 string, arg2 string, arg3 time.Duration) error {
 		arg2 string
 		arg3 time.Duration
 	}{arg1, arg2, arg3})
+	stub := fake.SetStub
+	fakeReturns := fake.setReturns
 	fake.recordInvocation("Set", []interface{}{arg1, arg2, arg3})
 	fake.setMutex.Unlock()
-	if fake.SetStub != nil {
-		return fake.SetStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeStore) SetCallCount() int {
+func (fake *FakeStorer) SetCallCount() int {
 	fake.setMutex.RLock()
 	defer fake.setMutex.RUnlock()
 	return len(fake.setArgsForCall)
 }
 
-func (fake *FakeStore) SetCalls(stub func(string, string, time.Duration) error) {
+func (fake *FakeStorer) SetCalls(stub func(string, string, time.Duration) error) {
 	fake.setMutex.Lock()
 	defer fake.setMutex.Unlock()
 	fake.SetStub = stub
 }
 
-func (fake *FakeStore) SetArgsForCall(i int) (string, string, time.Duration) {
+func (fake *FakeStorer) SetArgsForCall(i int) (string, string, time.Duration) {
 	fake.setMutex.RLock()
 	defer fake.setMutex.RUnlock()
 	argsForCall := fake.setArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeStore) SetReturns(result1 error) {
+func (fake *FakeStorer) SetReturns(result1 error) {
 	fake.setMutex.Lock()
 	defer fake.setMutex.Unlock()
 	fake.SetStub = nil
@@ -286,7 +290,7 @@ func (fake *FakeStore) SetReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeStore) SetReturnsOnCall(i int, result1 error) {
+func (fake *FakeStorer) SetReturnsOnCall(i int, result1 error) {
 	fake.setMutex.Lock()
 	defer fake.setMutex.Unlock()
 	fake.SetStub = nil
@@ -300,7 +304,7 @@ func (fake *FakeStore) SetReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeStore) Invocations() map[string][][]interface{} {
+func (fake *FakeStorer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.delMutex.RLock()
@@ -318,7 +322,7 @@ func (fake *FakeStore) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeStore) recordInvocation(key string, args []interface{}) {
+func (fake *FakeStorer) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {

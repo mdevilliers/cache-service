@@ -42,13 +42,7 @@ GOBUILDFLAGS :=
 GOBUILDFLAGS += -o $(BIN_OUTDIR)/$(BIN_NAME)
 
 # Linting
-OS := $(shell uname)
-GOLANGCI_LINT_VERSION=1.37.1
-ifeq ($(OS),Darwin)
-	GOLANGCI_LINT_ARCHIVE=golangci-lint-$(GOLANGCI_LINT_VERSION)-darwin-amd64.tar.gz
-else
-	GOLANGCI_LINT_ARCHIVE=golangci-lint-$(GOLANGCI_LINT_VERSION)-linux-amd64.tar.gz
-endif
+GOLANGCI_LINT_VERSION=1.51.1
 
 .PHONY: info
 info:
@@ -96,18 +90,13 @@ deploy:
 	kubectl delete -f k8s/ 2>/dev/null; true
 	kubectl create -f k8s/
 
-# the linting gods must be obeyed
+# The linting gods must be obeyed
 .PHONY: lint
-lint: $(BIN_OUTDIR)/golangci-lint/golangci-lint
-	$(BIN_OUTDIR)/golangci-lint/golangci-lint run
+lint: ./bin/golangci-lint
+	./bin/golangci-lint run
 
-$(BIN_OUTDIR)/golangci-lint/golangci-lint:
-	curl -OL https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCI_LINT_VERSION)/$(GOLANGCI_LINT_ARCHIVE)
-	mkdir -p $(BIN_OUTDIR)/golangci-lint/
-	tar -xf $(GOLANGCI_LINT_ARCHIVE) --strip-components=1 -C $(BIN_OUTDIR)/golangci-lint/
-	chmod +x $(BIN_OUTDIR)/golangci-lint
-	rm -f $(GOLANGCI_LINT_ARCHIVE)
-
+./bin/golangci-lint:
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v$(GOLANGCI_LINT_VERSION)
 .PHONY: install_proto_tools
 # install a known version of the protoc compiler
 # TODO : deploy to a Docker registry and each developer can download the same copy.
@@ -130,10 +119,10 @@ proto_verify: proto
 # generate mocks
 mocks:
 ifeq ("$(wildcard $(shell which counterfeiter))","")
-	go get github.com/maxbrunsfeld/counterfeiter/v6
+	GO111MODULE=off go get -u github.com/maxbrunsfeld/counterfeiter
 endif
 	counterfeiter -o=./proto/v1/mocks/service.go ./proto/v1/service.pb.go CacheClient
-	counterfeiter -o=./internal/service/mocks/store.go ./internal/service/service.go store
+	counterfeiter -o=./internal/service/mocks/store.go ./internal/service/service.go storer
 
 .PHONY: hack_image_deploy_local
 # task to deploy and build a local image using a `kind` environment

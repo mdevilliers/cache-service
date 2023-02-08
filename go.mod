@@ -1,6 +1,6 @@
 module github.com/mdevilliers/cache-service
 
-go 1.17
+go 1.19
 
 require (
 	github.com/go-redis/redis v6.15.9+incompatible
