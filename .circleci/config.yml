@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-svc:
     docker:
-      - image: cimg/go:1.17.5
+      - image: cimg/go:1.19
     steps:
       - checkout
       - run: make test
@@ -10,7 +10,7 @@ jobs:
       - run: make build
   make-release-image:
     docker:
-      - image: cimg/go:1.17.5
+      - image: cimg/go:1.19
     # TODO : implement make-release-image
     # Maybe this would be
     #  - a github release

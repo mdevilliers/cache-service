@@ -14,7 +14,7 @@ import (
 
 func Test_Cache(t *testing.T) {
 
-	fake := &mocks.FakeStore{}
+	fake := &mocks.FakeStorer{}
 	log := zerolog.New(nil).With().Logger()
 	ctx := context.Background()
 
@@ -76,7 +76,7 @@ func Test_Cache(t *testing.T) {
 
 func Test_GetByKey(t *testing.T) {
 
-	fake := &mocks.FakeStore{}
+	fake := &mocks.FakeStorer{}
 	log := zerolog.New(nil).With().Logger()
 	ctx := context.Background()
 
@@ -140,7 +140,7 @@ func Test_GetByKey(t *testing.T) {
 
 func Test_GetRandomN(t *testing.T) {
 
-	fake := &mocks.FakeStore{}
+	fake := &mocks.FakeStorer{}
 	log := zerolog.New(nil).With().Logger()
 	ctx := context.Background()
 
@@ -197,7 +197,7 @@ func Test_GetRandomN(t *testing.T) {
 
 func Test_Purge(t *testing.T) {
 
-	fake := &mocks.FakeStore{}
+	fake := &mocks.FakeStorer{}
 	log := zerolog.New(nil).With().Logger()
 	ctx := context.Background()
 
